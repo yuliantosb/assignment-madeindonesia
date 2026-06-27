@@ -1,7 +1,15 @@
+"use client";
+
 import { lowerBase, upperBase } from "@/utils/getDentalFiles";
 import { collapse } from "@/utils/helper";
+import { useState } from "react";
 
 export default function LeftSidebar() {
+  const [keyword, setKeyword] = useState("");
+
+  const filterUpperBase = upperBase.filter((x) => x.includes(keyword));
+  const filterLowerBase = lowerBase.filter((x) => x.includes(keyword));
+
   return (
     <div className="h-screen p-2 absolute left-0 top-0 z-10">
       <div className="bg-white px-4 py-6 w-[260px] rounded-md">
@@ -37,6 +45,8 @@ export default function LeftSidebar() {
                   type="text"
                   placeholder="Search models..."
                   className="focus:outline-none text-sm text-slate-600 w-full"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
                 />
               </div>
               <button className="border border-slate-200 group rounded-md leading-0 p-1.5 cursor-pointer hover:border-indigo-500">
@@ -49,11 +59,11 @@ export default function LeftSidebar() {
                   Upper Jaw
                 </span>
                 <span className="px-1.5 py-1 bg-slate-200 text-slate-600 text-xs rounded-lg font-semibold">
-                  {upperBase.length}
+                  {filterUpperBase.length}
                 </span>
               </div>
               <div className="grid grid-cols-1 gap-2">
-                {collapse(upperBase, 3, 2).map((upper) => {
+                {collapse(filterUpperBase, 3, 2).map((upper) => {
                   return upper === "..." ? (
                     <span className="text-slate-600 text-sm" key="0">
                       ...
@@ -79,11 +89,11 @@ export default function LeftSidebar() {
                   Lower Jaw
                 </span>
                 <span className="px-1.5 py-1 bg-slate-200 text-slate-600 text-xs rounded-lg font-semibold">
-                  {lowerBase.length}
+                  {filterLowerBase.length}
                 </span>
               </div>
               <div className="grid grid-cols-1 gap-2">
-                {collapse(lowerBase, 3, 2).map((lower) => {
+                {collapse(filterLowerBase, 3, 2).map((lower) => {
                   return lower === "..." ? (
                     <span className="text-slate-600 text-sm" key={0}>
                       ...

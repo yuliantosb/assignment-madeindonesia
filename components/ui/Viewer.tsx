@@ -1,26 +1,18 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  OrbitControls,
-  Bounds,
-  GizmoHelper,
-  GizmoViewcube,
-  PerspectiveCamera,
-} from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { Bounds, GizmoHelper, GizmoViewcube, Grid } from "@react-three/drei";
 import STLModel from "./STLModel";
 import { lowerBase, upperBase } from "@/utils/getDentalFiles";
-import { useEffect, useRef } from "react";
-import { useCameraStore } from "@/stores/useCameraStore";
+import CameraController from "./CameraController";
+import { useConfigStore } from "@/stores/useConfigStore";
 
 export default function Viewer() {
-  const { position } = useCameraStore();
-  const controls = useRef(null);
-  const camera = useRef(null);
+  const {
+    config: { mouth, wireframe, grid, axes },
+  } = useConfigStore();
 
-  useEffect(() => {
-    console.log(position, "position");
-  }, [position]);
+  const degToRad = (deg: number) => deg * (Math.PI / 180);
 
   return (
     <Canvas
@@ -32,23 +24,34 @@ export default function Viewer() {
       <GizmoHelper alignment="top-right">
         <GizmoViewcube />
       </GizmoHelper>
-
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} />
+
+      {grid && <Grid infiniteGrid />}
+      {axes && <axesHelper args={[100]} />}
 
       <Bounds fit clip observe>
         <group rotation={[-Math.PI / 2, 0, 0]}>
           {upperBase.map((file) => (
-            <STLModel key={file} url={`/assets/${file}`} />
+            <STLModel
+              key={file}
+              url={`/assets/${file}`}
+              wireframe={wireframe}
+            />
           ))}
 
-          {lowerBase.map((file) => (
-            <STLModel key={file} url={`/assets/${file}`} />
-          ))}
+          <group position={[0, 0, -mouth]} rotation={[degToRad(mouth), 0, 0]}>
+            {lowerBase.map((file) => (
+              <STLModel
+                key={file}
+                url={`/assets/${file}`}
+                wireframe={wireframe}
+              />
+            ))}
+          </group>
         </group>
       </Bounds>
-
-      <OrbitControls makeDefault />
+      <CameraController />
     </Canvas>
   );
 }

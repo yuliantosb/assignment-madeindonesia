@@ -7,9 +7,10 @@ import { useMemo } from "react";
 
 type Props = {
   url: string;
+  wireframe?: boolean;
 };
 
-export default function STLModel({ url }: Props) {
+export default function STLModel({ url, wireframe }: Props) {
   const geometry = useLoader(STLLoader, url);
 
   const material = useMemo(() => {
@@ -18,8 +19,9 @@ export default function STLModel({ url }: Props) {
     return new THREE.MeshStandardMaterial({
       color: isBase ? "#cfcfcf" : isAlveolar ? "#e8b8bf" : "#f4f4f1",
       roughness: 0.6,
+      wireframe: wireframe,
     });
-  }, [url]);
+  }, [url, wireframe]);
 
   return (
     <mesh geometry={geometry} material={material} castShadow receiveShadow />

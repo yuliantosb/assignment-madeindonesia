@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-const DIST = 250;
+const DIST = 100;
 
 export const CAMERA_VIEWS = {
   front: [0, 0, DIST],
@@ -23,7 +23,7 @@ type Store = {
 };
 
 export const useCameraStore = create<Store>((set) => ({
-  view: "isometric",
+  view: "front",
   position: CAMERA_VIEWS.front,
 
   setView: (view) =>
