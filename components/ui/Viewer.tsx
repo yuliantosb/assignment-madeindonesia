@@ -6,6 +6,8 @@ import STLModel from "./STLModel";
 import { lowerBase, upperBase } from "@/utils/getDentalFiles";
 import CameraController from "./CameraController";
 import { useConfigStore } from "@/stores/useConfigStore";
+import { useModelStore } from "@/stores/useModelStrore";
+import UniversalModel from "./UniversalModel";
 
 export default function Viewer() {
   const {
@@ -13,6 +15,7 @@ export default function Viewer() {
   } = useConfigStore();
 
   const degToRad = (deg: number) => deg * (Math.PI / 180);
+  const models = useModelStore((s) => s.models);
 
   return (
     <Canvas
@@ -20,6 +23,7 @@ export default function Viewer() {
         position: [0, 0, 250],
       }}
       className="bg-slate-50"
+      onPointerMissed={() => useModelStore.getState().select(null)}
     >
       <GizmoHelper alignment="top-right">
         <GizmoViewcube />
@@ -33,24 +37,24 @@ export default function Viewer() {
       <Bounds fit clip observe>
         <group rotation={[-Math.PI / 2, 0, 0]}>
           {upperBase.map((file) => (
-            <STLModel
-              key={file}
-              url={`/assets/${file}`}
-              wireframe={wireframe}
-            />
+            <STLModel key={file} url={file} wireframe={wireframe} />
           ))}
 
           <group position={[0, 0, -mouth]} rotation={[degToRad(mouth), 0, 0]}>
             {lowerBase.map((file) => (
-              <STLModel
-                key={file}
-                url={`/assets/${file}`}
-                wireframe={wireframe}
-              />
+              <STLModel key={file} url={file} wireframe={wireframe} />
             ))}
           </group>
         </group>
       </Bounds>
+      {models.map((model) => (
+        <UniversalModel
+          key={model.name}
+          url={model.url}
+          type={model.type}
+          name={model.name}
+        />
+      ))}
       <CameraController />
     </Canvas>
   );

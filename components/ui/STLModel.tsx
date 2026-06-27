@@ -4,6 +4,7 @@ import { useLoader } from "@react-three/fiber";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
 import { useMemo } from "react";
+import { useVisibilityStore } from "@/stores/useVisibilityStore";
 
 type Props = {
   url: string;
@@ -11,7 +12,9 @@ type Props = {
 };
 
 export default function STLModel({ url, wireframe }: Props) {
-  const geometry = useLoader(STLLoader, url);
+  const fullUrl = `assets/${url}`;
+  const geometry = useLoader(STLLoader, fullUrl);
+  const isHidden = useVisibilityStore((s) => s.isHidden(url));
 
   const material = useMemo(() => {
     const isAlveolar = url.includes("alveolar");
@@ -22,6 +25,8 @@ export default function STLModel({ url, wireframe }: Props) {
       wireframe: wireframe,
     });
   }, [url, wireframe]);
+
+  if (isHidden) return null;
 
   return (
     <mesh geometry={geometry} material={material} castShadow receiveShadow />
